@@ -83,9 +83,42 @@ def get_users_by_name(user_name: str, starts_with: bool =True) -> List[User]:
     # Convert this list of users into a list of User objects
     return convert_rows_to_user_list(users)
 
+# Add a user to the database
+def create_user(user: User):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = "INSERT INTO users (username, email) VALUES (?, ?)"
+    cursor.execute(query, (user.user_name, user.email))
+    
+    conn.commit()
+    conn.close()
 
+# Update a user in the database
+def update_user(user: User):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = "UPDATE users SET username = ?, email = ? WHERE user_id = ?"
+    cursor.execute(query, (user.user_name, user.email, user.id))
+    
+    conn.commit()
+    conn.close()
+
+# Delete a user from the database
+def delete_user(user_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = "DELETE FROM users WHERE user_id = ?"
+    cursor.execute(query, (user_id,))
+    
+    conn.commit()
+    conn.close()
+    
 # Usage
 ## Test to see if all users are returned
+# print("Get all users")
 # all_users = get_all_users()
 # for user in all_users:
 #    print(user)
@@ -95,14 +128,29 @@ def get_users_by_name(user_name: str, starts_with: bool =True) -> List[User]:
 
 ## Test to get a list of users by name
 # Test to get a list of users by name that start with the provided string
-print('Starts with')
-print("-----------")
-for n in get_users_by_name('l'):
-    print(n)
+# print('Starts with')
+# print("-----------")
+# for n in get_users_by_name('l'):
+#     print(n)
 
-# Test to get a list of users by name that start with the provided string
-print('Contains')
-print("-----------")
-for name in get_users_by_name('luke', False):
-    print(name)
+# # Test to get a list of users by name that start with the provided string
+# print('Contains')
+# print("-----------")
+# for name in get_users_by_name('luke', False):
+#     print(name)
 
+# # Test to create a user
+# print("Create a user")
+# print("-----------")
+# new_user = User(None, 'test_user', 'testuser@example.com')
+# create_user(new_user)
+# added_user = get_users_by_name('test_user')[0]
+# print(added_user)
+
+# Test to remove a user 
+print('Now delete the user')
+print("-----------")
+# Start by getting the last user put into the database
+last_user = get_all_users()[-1]
+delete_user(last_user.id)
+print(get_users_by_name(last_user.user_name))
